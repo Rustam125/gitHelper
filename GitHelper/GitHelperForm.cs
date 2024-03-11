@@ -6,7 +6,7 @@ using WinFormsApp.Models;
 
 namespace WinFormsApp
 {
-    public partial class Form1 : Form
+    public partial class GitHelperForm : Form
     {
         #region Fields
 
@@ -14,6 +14,7 @@ namespace WinFormsApp
         private readonly TextBoxContentModel _gitForkName_1;
         private readonly TextBoxContentModel _gitForkName_2;
         private readonly TextBoxContentModel _changesBetweenBranchesText;
+        private readonly TextBoxContentModel _pathToReleaseCatalogs;
         private List<string> _changesBetweenBranches;
         private WayToAccessGitEnum _wayToAccessGit;
 
@@ -21,24 +22,19 @@ namespace WinFormsApp
 
         #region Constructor
 
-        public Form1()
+        public GitHelperForm()
         {
             InitializeComponent();
 
             // fields
-            _pathToRepository = new TextBoxContentModel
-            {
-                Text = "D:\\REPO\\REO"
-            };
+            _pathToRepository = new TextBoxContentModel();
             _gitForkName_1 = new TextBoxContentModel
             {
                 Text = "master"
             };
-            _gitForkName_2 = new TextBoxContentModel
-            {
-                Text = "release/03.2024"
-            };
+            _gitForkName_2 = new TextBoxContentModel();
             _changesBetweenBranchesText = new TextBoxContentModel();
+            _pathToReleaseCatalogs = new TextBoxContentModel();
 
             Bindings();
             RadioButtons_CheckedChanged(null, null);
@@ -57,7 +53,7 @@ namespace WinFormsApp
 
         private void CreateCatalogs(object sender, EventArgs e)
         {
-            string path = textBox1.Text;
+            string path = _pathToReleaseCatalogs.Text;
             string releaseNumber = string.IsNullOrEmpty(textBox2.Text) ? "00" : textBox2.Text;
 
             if (string.IsNullOrEmpty(path))
@@ -71,7 +67,6 @@ namespace WinFormsApp
             }
 
             path = Path.Combine(path, $"release {releaseNumber}.{DateTime.Now.Year}");
-
             DirectoryInfo dirInfo = new DirectoryInfo(path);
 
             if (!dirInfo.Exists)
@@ -93,6 +88,16 @@ namespace WinFormsApp
                     "Сообщение",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
+        }
+
+        private void SelectPathToReleaseCatalogsButton_Click(object sender, EventArgs e)
+        {
+            string path = GitFiles.SelectFolderPath();
+
+            if (string.IsNullOrEmpty(path) == false)
+            {
+                _pathToReleaseCatalogs.Text = path;
+            }
         }
 
         #endregion
@@ -153,6 +158,9 @@ namespace WinFormsApp
             // Способ обращения к git
             radioButton1.CheckedChanged += new EventHandler(RadioButtons_CheckedChanged);
             radioButton2.CheckedChanged += new EventHandler(RadioButtons_CheckedChanged);
+
+            // Путь для формирования каталогов релиза
+            PathToReleaseCatalogsTextBox.DataBindings.Add(new Binding("Text", _pathToReleaseCatalogs, "Text"));
         }
 
         private string ReadTaskInfo(string text)

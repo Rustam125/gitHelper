@@ -1,6 +1,6 @@
 ﻿namespace WinFormsApp
 {
-    partial class Form1
+    partial class GitHelperForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,14 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GitHelperForm));
             tabControl1 = new System.Windows.Forms.TabControl();
             mainPage = new System.Windows.Forms.TabPage();
+            SelectPathToReleaseCatalogsButton = new System.Windows.Forms.Button();
             textBox3 = new System.Windows.Forms.TextBox();
             label5 = new System.Windows.Forms.Label();
             textBox2 = new System.Windows.Forms.TextBox();
             label4 = new System.Windows.Forms.Label();
             button2 = new System.Windows.Forms.Button();
-            textBox1 = new System.Windows.Forms.TextBox();
+            PathToReleaseCatalogsTextBox = new System.Windows.Forms.TextBox();
             label3 = new System.Windows.Forms.Label();
             button1 = new System.Windows.Forms.Button();
             label2 = new System.Windows.Forms.Label();
@@ -43,6 +45,9 @@
             richTextBox2 = new System.Windows.Forms.RichTextBox();
             richTextBox1 = new System.Windows.Forms.RichTextBox();
             gitFilesPage = new System.Windows.Forms.TabPage();
+            groupBox1 = new System.Windows.Forms.GroupBox();
+            radioButton1 = new System.Windows.Forms.RadioButton();
+            radioButton2 = new System.Windows.Forms.RadioButton();
             SelectPathToRepositoryButton = new System.Windows.Forms.Button();
             PathToRepositoryTextBox = new System.Windows.Forms.TextBox();
             label9 = new System.Windows.Forms.Label();
@@ -54,9 +59,6 @@
             label7 = new System.Windows.Forms.Label();
             gitForkNameTextBox_1 = new System.Windows.Forms.TextBox();
             label6 = new System.Windows.Forms.Label();
-            radioButton1 = new System.Windows.Forms.RadioButton();
-            radioButton2 = new System.Windows.Forms.RadioButton();
-            groupBox1 = new System.Windows.Forms.GroupBox();
             tabControl1.SuspendLayout();
             mainPage.SuspendLayout();
             gitFilesPage.SuspendLayout();
@@ -76,12 +78,13 @@
             // 
             // mainPage
             // 
+            mainPage.Controls.Add(SelectPathToReleaseCatalogsButton);
             mainPage.Controls.Add(textBox3);
             mainPage.Controls.Add(label5);
             mainPage.Controls.Add(textBox2);
             mainPage.Controls.Add(label4);
             mainPage.Controls.Add(button2);
-            mainPage.Controls.Add(textBox1);
+            mainPage.Controls.Add(PathToReleaseCatalogsTextBox);
             mainPage.Controls.Add(label3);
             mainPage.Controls.Add(button1);
             mainPage.Controls.Add(label2);
@@ -95,6 +98,16 @@
             mainPage.TabIndex = 0;
             mainPage.Text = "Основное";
             mainPage.UseVisualStyleBackColor = true;
+            // 
+            // SelectPathToReleaseCatalogsButton
+            // 
+            SelectPathToReleaseCatalogsButton.Location = new System.Drawing.Point(364, 461);
+            SelectPathToReleaseCatalogsButton.Name = "SelectPathToReleaseCatalogsButton";
+            SelectPathToReleaseCatalogsButton.Size = new System.Drawing.Size(32, 23);
+            SelectPathToReleaseCatalogsButton.TabIndex = 25;
+            SelectPathToReleaseCatalogsButton.Text = "...";
+            SelectPathToReleaseCatalogsButton.UseVisualStyleBackColor = true;
+            SelectPathToReleaseCatalogsButton.Click += SelectPathToReleaseCatalogsButton_Click;
             // 
             // textBox3
             // 
@@ -142,13 +155,13 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += CreateCatalogs;
             // 
-            // textBox1
+            // PathToReleaseCatalogsTextBox
             // 
-            textBox1.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            textBox1.Location = new System.Drawing.Point(6, 461);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new System.Drawing.Size(390, 23);
-            textBox1.TabIndex = 19;
+            PathToReleaseCatalogsTextBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            PathToReleaseCatalogsTextBox.Location = new System.Drawing.Point(6, 461);
+            PathToReleaseCatalogsTextBox.Name = "PathToReleaseCatalogsTextBox";
+            PathToReleaseCatalogsTextBox.Size = new System.Drawing.Size(354, 23);
+            PathToReleaseCatalogsTextBox.TabIndex = 19;
             // 
             // label3
             // 
@@ -229,6 +242,40 @@
             gitFilesPage.TabIndex = 1;
             gitFilesPage.Text = "GIT files";
             gitFilesPage.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(radioButton1);
+            groupBox1.Controls.Add(radioButton2);
+            groupBox1.Location = new System.Drawing.Point(6, 148);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new System.Drawing.Size(300, 49);
+            groupBox1.TabIndex = 30;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Способ обращения к git";
+            // 
+            // radioButton1
+            // 
+            radioButton1.AutoSize = true;
+            radioButton1.Checked = true;
+            radioButton1.Location = new System.Drawing.Point(6, 22);
+            radioButton1.Name = "radioButton1";
+            radioButton1.Size = new System.Drawing.Size(156, 19);
+            radioButton1.TabIndex = 28;
+            radioButton1.TabStop = true;
+            radioButton1.Text = "Командная строка + file";
+            radioButton1.UseVisualStyleBackColor = true;
+            // 
+            // radioButton2
+            // 
+            radioButton2.AutoSize = true;
+            radioButton2.Location = new System.Drawing.Point(168, 22);
+            radioButton2.Name = "radioButton2";
+            radioButton2.Size = new System.Drawing.Size(83, 19);
+            radioButton2.TabIndex = 29;
+            radioButton2.TabStop = true;
+            radioButton2.Text = "PowerShell";
+            radioButton2.UseVisualStyleBackColor = true;
             // 
             // SelectPathToRepositoryButton
             // 
@@ -327,48 +374,15 @@
             label6.TabIndex = 0;
             label6.Text = "Наименование ветки 1";
             // 
-            // radioButton1
-            // 
-            radioButton1.AutoSize = true;
-            radioButton1.Checked = true;
-            radioButton1.Location = new System.Drawing.Point(6, 22);
-            radioButton1.Name = "radioButton1";
-            radioButton1.Size = new System.Drawing.Size(156, 19);
-            radioButton1.TabIndex = 28;
-            radioButton1.TabStop = true;
-            radioButton1.Text = "Командная строка + file";
-            radioButton1.UseVisualStyleBackColor = true;
-            // 
-            // radioButton2
-            // 
-            radioButton2.AutoSize = true;
-            radioButton2.Location = new System.Drawing.Point(168, 22);
-            radioButton2.Name = "radioButton2";
-            radioButton2.Size = new System.Drawing.Size(83, 19);
-            radioButton2.TabIndex = 29;
-            radioButton2.TabStop = true;
-            radioButton2.Text = "PowerShell";
-            radioButton2.UseVisualStyleBackColor = true;
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(radioButton1);
-            groupBox1.Controls.Add(radioButton2);
-            groupBox1.Location = new System.Drawing.Point(6, 148);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(300, 49);
-            groupBox1.TabIndex = 30;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Способ обращения к git";
-            // 
-            // Form1
+            // GitHelperForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(825, 550);
             Controls.Add(tabControl1);
-            Name = "Form1";
-            Text = "Gitlab tasks";
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            Name = "GitHelperForm";
+            Text = "GitHelper";
             tabControl1.ResumeLayout(false);
             mainPage.ResumeLayout(false);
             mainPage.PerformLayout();
@@ -388,7 +402,7 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox PathToReleaseCatalogsTextBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label2;
@@ -409,5 +423,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.Button SelectPathToReleaseCatalogsButton;
     }
 }
