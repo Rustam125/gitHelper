@@ -101,6 +101,7 @@
             // 
             // SelectPathToReleaseCatalogsButton
             // 
+            SelectPathToReleaseCatalogsButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             SelectPathToReleaseCatalogsButton.Location = new System.Drawing.Point(364, 461);
             SelectPathToReleaseCatalogsButton.Name = "SelectPathToReleaseCatalogsButton";
             SelectPathToReleaseCatalogsButton.Size = new System.Drawing.Size(32, 23);
