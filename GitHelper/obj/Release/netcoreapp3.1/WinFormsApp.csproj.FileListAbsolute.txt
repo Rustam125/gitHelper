@@ -1,0 +1,15 @@
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\bin\Release\netcoreapp3.1\WinFormsApp.exe
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\bin\Release\netcoreapp3.1\WinFormsApp.deps.json
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\bin\Release\netcoreapp3.1\WinFormsApp.runtimeconfig.json
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\bin\Release\netcoreapp3.1\WinFormsApp.runtimeconfig.dev.json
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\bin\Release\netcoreapp3.1\WinFormsApp.dll
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\bin\Release\netcoreapp3.1\WinFormsApp.pdb
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\obj\Release\netcoreapp3.1\WinFormsApp.Form1.resources
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\obj\Release\netcoreapp3.1\WinFormsApp.csproj.GenerateResource.cache
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\obj\Release\netcoreapp3.1\WinFormsApp.GeneratedMSBuildEditorConfig.editorconfig
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\obj\Release\netcoreapp3.1\WinFormsApp.AssemblyInfoInputs.cache
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\obj\Release\netcoreapp3.1\WinFormsApp.AssemblyInfo.cs
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\obj\Release\netcoreapp3.1\WinFormsApp.csproj.CoreCompileInputs.cache
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\obj\Release\netcoreapp3.1\WinFormsApp.dll
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\obj\Release\netcoreapp3.1\WinFormsApp.pdb
+D:\Работа\РЭО\Формирование списка ID тасков из Gitlab\WinFormsApp\obj\Release\netcoreapp3.1\WinFormsApp.genruntimeconfig.cache
