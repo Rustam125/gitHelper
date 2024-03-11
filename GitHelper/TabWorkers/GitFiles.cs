@@ -20,7 +20,7 @@ namespace WinFormsApp
             string forkName_2,
             WayToAccessGitEnum wayToAccessGit)
         {
-            List<string> result = new();
+            List<string> result = new List<string>();
 
             if (CheckRepoPath(pathToRepo) == false ||
                 CheckForkName(forkName_1, 1) == false ||
@@ -46,7 +46,7 @@ namespace WinFormsApp
             string repoPath)
         {
             string path = SelectFolderPath();
-            List<string> errors = new();
+            List<string> errors = new List<string>();
 
             if (CheckRepoPath(path) == false ||
                 string.IsNullOrEmpty(repoPath) ||
@@ -73,8 +73,8 @@ namespace WinFormsApp
                 {
                     string repoFilePath = Path.Combine(repoPath, filePath);
                     string targetFilePath = Path.Combine(path, filePath);
-                    DirectoryInfo repoDirectoryInfo = new(Path.GetDirectoryName(repoFilePath));
-                    DirectoryInfo targetDirectoryInfo = new(Path.GetDirectoryName(targetFilePath));
+                    DirectoryInfo repoDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(repoFilePath));
+                    DirectoryInfo targetDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(targetFilePath));
 
                     if (repoDirectoryInfo.Exists == false ||
                         File.Exists(repoFilePath) == false)
@@ -167,7 +167,7 @@ namespace WinFormsApp
             string forkName_1,
             string forkName_2)
         {
-            List<string> result = new();
+            List<string> result = new List<string>();
 
             try
             {
@@ -209,7 +209,7 @@ namespace WinFormsApp
             string forkName_1,
             string forkName_2)
         {
-            List<string> result = new();
+            List<string> result = new List<string>();
 
             try
             {
@@ -218,7 +218,7 @@ namespace WinFormsApp
                 string cmd_1 = $"cd {pathToRepo}";
                 string cmd_2 = $"git diff --name-only --encoding=utf8 {forkName_1}..{forkName_2} > \"{diffPath}\"";
 
-                ProcessStartInfo startInfo = new()
+                ProcessStartInfo startInfo = new ProcessStartInfo()
                 {
                     FileName = "cmd.exe",
                     Arguments = $"/c {cmd_1}&{cmd_2}",
@@ -228,7 +228,7 @@ namespace WinFormsApp
                     CreateNoWindow = true,
                 };
 
-                using Process process = new() { StartInfo = startInfo };
+                using Process process = new Process() { StartInfo = startInfo };
                 process.Start();
                 string error = process.StandardError.ReadToEnd();
 
