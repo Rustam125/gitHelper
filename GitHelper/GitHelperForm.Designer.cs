@@ -79,6 +79,7 @@
             // 
             // mainPage
             // 
+            mainPage.AutoScroll = true;
             mainPage.Controls.Add(SelectPathToReleaseCatalogsButton);
             mainPage.Controls.Add(textBox3);
             mainPage.Controls.Add(label5);
@@ -225,6 +226,7 @@
             // 
             // gitFilesPage
             // 
+            gitFilesPage.AutoScroll = true;
             gitFilesPage.Controls.Add(ChangesCounterLabel);
             gitFilesPage.Controls.Add(groupBox1);
             gitFilesPage.Controls.Add(SelectPathToRepositoryButton);

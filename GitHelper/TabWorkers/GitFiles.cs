@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -12,6 +13,12 @@ namespace WinFormsApp
 {
     public class GitFiles
     {
+        #region Fields
+
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        #endregion
+
         #region Public methods
 
         public static List<string> ShowChangesBetweenBranches(
@@ -76,14 +83,21 @@ namespace WinFormsApp
                     DirectoryInfo repoDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(repoFilePath));
                     DirectoryInfo targetDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(targetFilePath));
 
-                    if (repoDirectoryInfo.Exists == false ||
-                        File.Exists(repoFilePath) == false)
+                    if (repoDirectoryInfo.Exists == false)
                     {
+                        _logger.Warn($"Копирование файлов. Отсуствует директория {repoDirectoryInfo.FullName}.");
+                        continue;
+                    }
+
+                    if (File.Exists(repoFilePath) == false)
+                    {
+                        _logger.Warn($"Копирование файлов. Отсуствует файл {repoFilePath}.");
                         continue;
                     }
 
                     if (targetDirectoryInfo.Exists == false)
                     {
+                        _logger.Info($"Копирование файлов. Создание каталога {targetDirectoryInfo.FullName}");
                         targetDirectoryInfo.Create();
                     }
 
@@ -127,6 +141,7 @@ namespace WinFormsApp
 
         public static void ErrorMessage(string text)
         {
+            _logger.Error(text);
             MessageBox.Show(
                     text,
                     "Ошибка",

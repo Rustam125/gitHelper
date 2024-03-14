@@ -1,24 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>resources\gitHelperIcon.ico</ApplicationIcon>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ApplicationIcon>resources\gitHelperIcon.ico</ApplicationIcon>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="resources\gitHelperIcon.ico" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="resources\gitHelperIcon.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.0" />
-    <PackageReference Include="System.Management.Automation" Version="7.0.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="NLog.config">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Decoder\Decoder.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.0" />
+		<PackageReference Include="NLog.Extensions.Logging" Version="5.3.8" />
+		<PackageReference Include="System.Management.Automation" Version="7.0.0" />
+		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Decoder\Decoder.csproj" />
+	</ItemGroup>
 
 </Project>
