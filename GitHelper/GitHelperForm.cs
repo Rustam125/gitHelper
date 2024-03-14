@@ -36,7 +36,7 @@ namespace WinFormsApp
             _changesBetweenBranchesText = new TextBoxContentModel();
             _pathToReleaseCatalogs = new TextBoxContentModel();
 
-            Bindings();
+            SetBindings();
             RadioButtons_CheckedChanged(null, null);
         }
 
@@ -143,12 +143,12 @@ namespace WinFormsApp
 
         #region Private methods
 
-        private void Bindings()
+        private void SetBindings()
         {
             // Путь к репозиторию
             PathToRepositoryTextBox.DataBindings.Add(new Binding("Text", _pathToRepository, "Text"));
 
-            // ветки
+            // Ветки
             gitForkNameTextBox_1.DataBindings.Add(new Binding("Text", _gitForkName_1, "Text"));
             gitForkNameTextBox_2.DataBindings.Add(new Binding("Text", _gitForkName_2, "Text"));
 
@@ -161,6 +161,9 @@ namespace WinFormsApp
 
             // Путь для формирования каталогов релиза
             PathToReleaseCatalogsTextBox.DataBindings.Add(new Binding("Text", _pathToReleaseCatalogs, "Text"));
+
+            // Кол-во строк списка изменений
+            ChangesCounterLabel.DataBindings.Add(new Binding("Text", _changesBetweenBranchesText, "LinesCountText"));
         }
 
         private string ReadTaskInfo(string text)

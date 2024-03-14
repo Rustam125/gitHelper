@@ -45,6 +45,7 @@
             richTextBox2 = new System.Windows.Forms.RichTextBox();
             richTextBox1 = new System.Windows.Forms.RichTextBox();
             gitFilesPage = new System.Windows.Forms.TabPage();
+            ChangesCounterLabel = new System.Windows.Forms.Label();
             groupBox1 = new System.Windows.Forms.GroupBox();
             radioButton1 = new System.Windows.Forms.RadioButton();
             radioButton2 = new System.Windows.Forms.RadioButton();
@@ -224,6 +225,7 @@
             // 
             // gitFilesPage
             // 
+            gitFilesPage.Controls.Add(ChangesCounterLabel);
             gitFilesPage.Controls.Add(groupBox1);
             gitFilesPage.Controls.Add(SelectPathToRepositoryButton);
             gitFilesPage.Controls.Add(PathToRepositoryTextBox);
@@ -243,6 +245,15 @@
             gitFilesPage.TabIndex = 1;
             gitFilesPage.Text = "GIT files";
             gitFilesPage.UseVisualStyleBackColor = true;
+            // 
+            // ChangesCounterLabel
+            // 
+            ChangesCounterLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            ChangesCounterLabel.AutoSize = true;
+            ChangesCounterLabel.Location = new System.Drawing.Point(323, 481);
+            ChangesCounterLabel.Name = "ChangesCounterLabel";
+            ChangesCounterLabel.Size = new System.Drawing.Size(0, 15);
+            ChangesCounterLabel.TabIndex = 31;
             // 
             // groupBox1
             // 
@@ -339,7 +350,7 @@
             ChangesBetweenBranchesRichTextBox.Location = new System.Drawing.Point(323, 21);
             ChangesBetweenBranchesRichTextBox.Name = "ChangesBetweenBranchesRichTextBox";
             ChangesBetweenBranchesRichTextBox.ReadOnly = true;
-            ChangesBetweenBranchesRichTextBox.Size = new System.Drawing.Size(468, 475);
+            ChangesBetweenBranchesRichTextBox.Size = new System.Drawing.Size(468, 457);
             ChangesBetweenBranchesRichTextBox.TabIndex = 15;
             ChangesBetweenBranchesRichTextBox.Text = "";
             // 
@@ -425,5 +436,6 @@
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.Button SelectPathToReleaseCatalogsButton;
+        private System.Windows.Forms.Label ChangesCounterLabel;
     }
 }
