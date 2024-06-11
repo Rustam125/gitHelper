@@ -16,7 +16,7 @@ namespace GitHelper.TabWorkers
                 new List<string>()
                 {
                     $"cd {path}",
-                    $"dotnet build"
+                    $"dotnet build --no-incremental"
                 });
 
         /// <summary>
