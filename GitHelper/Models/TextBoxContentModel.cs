@@ -1,12 +1,19 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace WinFormsApp.Models
+namespace GitHelper.Models
 {
     public class TextBoxContentModel : INotifyPropertyChanged
     {
         private string _text;
         private int _linesCount;
+
+        public TextBoxContentModel() { }
+
+        public TextBoxContentModel(string text)
+        {
+            _text = text;
+        }
 
         public string Text
         {

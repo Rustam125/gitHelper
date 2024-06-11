@@ -1,4 +1,4 @@
-﻿namespace WinFormsApp.Models
+﻿namespace GitHelper.Models
 {
     public enum WayToAccessGitEnum
     {

@@ -3,3 +3,7 @@ GitHelper/obj/
 Decoder/bin/
 Decoder/obj/
 .vs/
+ConfigurationManager/obj/
+Configurations/bin/
+Configurations/obj/
+packages/

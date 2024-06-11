@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
-using WinFormsApp.Models;
+using GitHelper.Helpers;
+using GitHelper.Models;
+using GitHelper.TabWorkers;
 
-namespace WinFormsApp
+namespace GitHelper
 {
     public partial class GitHelperForm : Form
     {
@@ -15,8 +19,14 @@ namespace WinFormsApp
         private readonly TextBoxContentModel _gitForkName_2;
         private readonly TextBoxContentModel _changesBetweenBranchesText;
         private readonly TextBoxContentModel _pathToReleaseCatalogs;
+        private readonly TextBoxContentModel _pathToRepositoryNetProjectBuild;
+        private readonly TextBoxContentModel _pathToRepositoryWebProjectBuild;
+        private readonly TextBoxContentModel _pathToRepositoryCustomBuild;
+        private readonly TextBoxContentModel _resultBuild;
+        private readonly TextBoxContentModel _customScriptArguments;
         private List<string> _changesBetweenBranches;
         private WayToAccessGitEnum _wayToAccessGit;
+        private BackgroundWorker _backgroundWorkerBuild;
 
         #endregion
 
@@ -27,14 +37,16 @@ namespace WinFormsApp
             InitializeComponent();
 
             // fields
-            _pathToRepository = new TextBoxContentModel();
-            _gitForkName_1 = new TextBoxContentModel
-            {
-                Text = "master"
-            };
-            _gitForkName_2 = new TextBoxContentModel();
+            _pathToRepository = new TextBoxContentModel(Configurations.AppSettings.PathToRepo);
+            _gitForkName_1 = new TextBoxContentModel(Configurations.AppSettings.FirstBranchName);
+            _gitForkName_2 = new TextBoxContentModel(Configurations.AppSettings.SecondBranchName);
             _changesBetweenBranchesText = new TextBoxContentModel();
-            _pathToReleaseCatalogs = new TextBoxContentModel();
+            _pathToReleaseCatalogs = new TextBoxContentModel(Configurations.AppSettings.PathToReleaseCatalogs);
+            _pathToRepositoryNetProjectBuild = new TextBoxContentModel(Configurations.AppSettings.PathToRepositoryNetProjectBuild);
+            _pathToRepositoryWebProjectBuild = new TextBoxContentModel(Configurations.AppSettings.PathToRepositoryWebProjectBuild);
+            _pathToRepositoryCustomBuild = new TextBoxContentModel(Configurations.AppSettings.PathToRepositoryCustomBuild);
+            _customScriptArguments = new TextBoxContentModel(Configurations.AppSettings.CustomScriptArguments);
+            _resultBuild = new TextBoxContentModel();
 
             SetBindings();
             RadioButtons_CheckedChanged(null, null);
@@ -46,7 +58,7 @@ namespace WinFormsApp
 
         #region Main page
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             richTextBox2.Text = ReadTaskInfo(richTextBox1.Text);
         }
@@ -58,11 +70,15 @@ namespace WinFormsApp
 
             if (string.IsNullOrEmpty(path))
             {
-                MessageBox.Show(
-                    "Указан пустой путь",
-                    "Сообщение",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                ShowMessageHelper.ShowError("Указан пустой путь");
+                return;
+            }
+
+            string[] releaseCatalogs = Configurations.AppSettings.ReleaseCatalogs;
+
+            if (releaseCatalogs == null || releaseCatalogs.Length == 0)
+            {
+                ShowMessageHelper.ShowError("Не удалось получить каталоги для создания. Проверьте настройки App.config.");
                 return;
             }
 
@@ -74,20 +90,31 @@ namespace WinFormsApp
                 dirInfo.Create();
             }
 
-            dirInfo.CreateSubdirectory(@"web js");
-            dirInfo.CreateSubdirectory(@"Scripts");
-            dirInfo.CreateSubdirectory(@"Fixes");
-            dirInfo.CreateSubdirectory(@"extensions");
-            dirInfo.CreateSubdirectory(@"extensions\web");
-            dirInfo.CreateSubdirectory(@"extensions\server");
-            dirInfo.CreateSubdirectory(@"extensions\chronos");
-            dirInfo.CreateSubdirectory(@"Configuration");
+            foreach (string catalog in releaseCatalogs)
+            {
+                dirInfo.CreateSubdirectory(catalog);
+            };
 
-            MessageBox.Show(
-                    "Каталоги успешно созданы!",
-                    "Сообщение",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+            CopyFixesFiles(releaseCatalogs, dirInfo);
+            ShowMessageHelper.ShowInfo("Каталоги успешно созданы!");
+        }
+
+        private void CopyFixesFiles(string[] releaseCatalogs, DirectoryInfo dirInfo)
+        {
+            string fixesCatalogName = "Fixes";
+
+            if (releaseCatalogs.Contains(fixesCatalogName) == false)
+            {
+                return;
+            }
+
+            string sourceDirectory = Path.Combine(Environment.CurrentDirectory, "resources", fixesCatalogName);
+            string destinationDirectory = Path.Combine(dirInfo.FullName, fixesCatalogName);
+            string constraintsOffFileName = "ConstraintsOff.pg.sql";
+            string constraintsOnFileName = "ConstraintsOn.pg.sql";
+
+            File.Copy(Path.Combine(sourceDirectory, constraintsOffFileName), Path.Combine(destinationDirectory, constraintsOffFileName));
+            File.Copy(Path.Combine(sourceDirectory, constraintsOnFileName), Path.Combine(destinationDirectory, constraintsOnFileName));
         }
 
         private void SelectPathToReleaseCatalogsButton_Click(object sender, EventArgs e)
@@ -107,7 +134,7 @@ namespace WinFormsApp
         private void ShowChangesBetweenBranchesButton_Click(object sender, EventArgs e)
         {
             _changesBetweenBranches = GitFiles.ShowChangesBetweenBranches(_pathToRepository.Text, _gitForkName_1.Text, _gitForkName_2.Text, _wayToAccessGit);
-            SetChangesBetweenBranches();
+            SetTextBoxContentModelFromList(_changesBetweenBranches, _changesBetweenBranchesText);
         }
 
         private void CopyModifiedFilesToDirectoryButton_Click(object sender, EventArgs e)
@@ -115,15 +142,8 @@ namespace WinFormsApp
             GitFiles.CopyModifiedFilesToDirectory(_changesBetweenBranches, _pathToRepository.Text);
         }
 
-        private void SelectPathToRepositoryButton_Click(object sender, EventArgs e)
-        {
-            string path = GitFiles.SelectFolderPath();
-
-            if (string.IsNullOrEmpty(path) == false)
-            {
-                _pathToRepository.Text = path;
-            }
-        }
+        private void SelectPathToRepositoryButton_Click(object sender, EventArgs e) =>
+            SelectPathToTextBoxContentModel(_pathToRepository);
 
         private void RadioButtons_CheckedChanged(object sender, EventArgs e)
         {
@@ -139,6 +159,64 @@ namespace WinFormsApp
 
         #endregion
 
+        #region Build page
+
+        private void SelectPathToNetProjectBuildButton_Click(object sender, EventArgs e) =>
+            SelectPathToTextBoxContentModel(_pathToRepositoryNetProjectBuild);
+
+        private void SelectPathToWebProjectBuildButton_Click(object sender, EventArgs e) =>
+            SelectPathToTextBoxContentModel(_pathToRepositoryWebProjectBuild);
+
+        private void SelectPathToCustomScriptBuildButton_Click(object sender, EventArgs e)
+        {
+            string fileName = FilesHelper.SelectScriptFullFileName();
+
+            if (_pathToRepositoryCustomBuild != null &&
+                string.IsNullOrEmpty(fileName) == false)
+            {
+                _pathToRepositoryCustomBuild.Text = fileName;
+            }
+        }
+
+        private void BuildNetButton_Click(object sender, EventArgs e) =>
+            InitializeBackgroundWorkerBuild(
+                (sender, e) =>
+                {
+                    _backgroundWorkerBuild.ReportProgress(0);
+                    e.Result = BuildHelper.BuildNetProject(_pathToRepositoryNetProjectBuild?.Text);
+                });
+
+        private void BuildWebButton_Click(object sender, EventArgs e) =>
+            InitializeBackgroundWorkerBuild(
+                (sender, e) =>
+                {
+                    _backgroundWorkerBuild.ReportProgress(0);
+                    e.Result = BuildHelper.BuildNpmProject(_pathToRepositoryWebProjectBuild?.Text);
+                });
+
+        private void BuildAllButton_Click(object sender, EventArgs e) =>
+            InitializeBackgroundWorkerBuild(
+                (sender, e) =>
+                {
+                    _backgroundWorkerBuild.ReportProgress(0);
+                    var netResults = BuildHelper.BuildNetProject(_pathToRepositoryNetProjectBuild?.Text);
+                    var npmResults = BuildHelper.BuildNpmProject(_pathToRepositoryWebProjectBuild?.Text);
+                    netResults.AddRange(npmResults);
+                    e.Result = netResults;
+                });
+
+        private void BuildCustomScriptButton_Click(object sender, EventArgs e)
+        {
+            InitializeBackgroundWorkerBuild(
+                (sender, e) =>
+                {
+                    _backgroundWorkerBuild.ReportProgress(0);
+                    e.Result = BuildHelper.BuildCustomScript(_pathToRepositoryCustomBuild?.Text, _customScriptArguments?.Text);
+                });
+        }
+
+        #endregion
+
         #endregion
 
         #region Private methods
@@ -147,6 +225,7 @@ namespace WinFormsApp
         {
             // Путь к репозиторию
             PathToRepositoryTextBox.DataBindings.Add(new Binding("Text", _pathToRepository, "Text"));
+            PathToRepositoryBuildTextBox.DataBindings.Add(new Binding("Text", _pathToRepository, "Text"));
 
             // Ветки
             gitForkNameTextBox_1.DataBindings.Add(new Binding("Text", _gitForkName_1, "Text"));
@@ -164,6 +243,15 @@ namespace WinFormsApp
 
             // Кол-во строк списка изменений
             ChangesCounterLabel.DataBindings.Add(new Binding("Text", _changesBetweenBranchesText, "LinesCountText"));
+
+            // Пути сборки решения
+            PathToRepositoryNetProjectBuildTextBox.DataBindings.Add(new Binding("Text", _pathToRepositoryNetProjectBuild, "Text"));
+            PathToRepositoryWebProjectBuildTextBox.DataBindings.Add(new Binding("Text", _pathToRepositoryWebProjectBuild, "Text"));
+            PathToRepositoryCustomBuildTextBox.DataBindings.Add(new Binding("Text", _pathToRepositoryCustomBuild, "Text"));
+            CustomScriptArgumentsTextBox.DataBindings.Add(new Binding("Text", _customScriptArguments, "Text"));
+
+            // Результат сборки
+            ResultBuildRichTextBox.DataBindings.Add(new Binding("Text", _resultBuild, "Text"));
         }
 
         private string ReadTaskInfo(string text)
@@ -207,23 +295,94 @@ namespace WinFormsApp
             return result;
         }
 
-        private void SetChangesBetweenBranches()
+        private void SetTextBoxContentModelFromList(
+            List<string> collection,
+            TextBoxContentModel textBoxContentModel)
         {
-            string text = _changesBetweenBranches != null ?
-                string.Join(Environment.NewLine, _changesBetweenBranches) :
+            string text = collection != null ?
+                string.Join(Environment.NewLine, collection) :
                 string.Empty;
 
             try
             {
                 text = Decoder.Decoder.DecodeText(text);
+
+                if (textBoxContentModel == null)
+                {
+                    throw new Exception("Не удалось определить текстовое поле для записи результата.");
+                }
             }
             catch (Exception ex)
             {
-                GitFiles.ErrorMessage($"Ошибка кодирования:{Environment.NewLine}{ex.Message}");
+                ShowMessageHelper.ShowError($"Ошибка кодирования:{Environment.NewLine}{ex.Message}");
+                return;
             }
 
-            _changesBetweenBranchesText.Text = text;
+            textBoxContentModel.Text = text;
         }
+
+        /// <summary>
+        /// Сохранение конфигурации.
+        /// </summary>
+        private void SaveConfiguration(object sender, EventArgs e)
+        {
+            Configurations.AppSettings.FirstBranchName = _gitForkName_1?.Text;
+            Configurations.AppSettings.SecondBranchName = _gitForkName_2?.Text;
+            Configurations.AppSettings.PathToRepo = _pathToRepository?.Text;
+            Configurations.AppSettings.PathToReleaseCatalogs = _pathToReleaseCatalogs?.Text;
+            Configurations.AppSettings.PathToRepositoryNetProjectBuild = _pathToRepositoryNetProjectBuild?.Text;
+            Configurations.AppSettings.PathToRepositoryWebProjectBuild = _pathToRepositoryWebProjectBuild?.Text;
+            Configurations.AppSettings.PathToRepositoryCustomBuild = _pathToRepositoryCustomBuild?.Text;
+            Configurations.AppSettings.CustomScriptArguments = _customScriptArguments?.Text;
+            ShowMessageHelper.ShowInfo("Настройки успешно сохранены!");
+        }
+
+        private void SelectPathToTextBoxContentModel(TextBoxContentModel textBoxContentModel)
+        {
+            if (textBoxContentModel == null)
+            {
+                return;
+            }
+
+            string path = GitFiles.SelectFolderPath();
+
+            if (string.IsNullOrEmpty(path) == false)
+            {
+                textBoxContentModel.Text = path;
+            }
+        }
+
+        #region Build page
+
+        private void InitializeBackgroundWorkerBuild(DoWorkEventHandler doWorkEventHandler)
+        {
+            _backgroundWorkerBuild = new BackgroundWorker
+            {
+                WorkerReportsProgress = true
+            };
+
+            _backgroundWorkerBuild.ProgressChanged += (sender, e) =>
+            {
+                LoadingPictureBox.Visible = true;
+                LoadingPictureBox.Size = new System.Drawing.Size(this.Width, this.Height);
+                LoadingPictureBox.BringToFront();
+            };
+
+            _backgroundWorkerBuild.RunWorkerCompleted += (sender, e) =>
+            {
+                if (e.Result != null)
+                {
+                    SetTextBoxContentModelFromList((List<string>)e.Result, _resultBuild);
+                }
+
+                LoadingPictureBox.Visible = false;
+            };
+
+            _backgroundWorkerBuild.DoWork += doWorkEventHandler;
+            _backgroundWorkerBuild.RunWorkerAsync();
+        }
+
+        #endregion
 
         #endregion
     }

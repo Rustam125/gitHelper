@@ -1,15 +1,13 @@
 ﻿using NLog;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Management.Automation;
 using System.Windows.Forms;
-using WinFormsApp.Models;
+using GitHelper.Models;
+using GitHelper.Helpers;
 
-namespace WinFormsApp
+namespace GitHelper
 {
     public class GitFiles
     {
@@ -116,11 +114,7 @@ namespace WinFormsApp
             }
             else
             {
-                MessageBox.Show(
-                    "Копирование файлов завершено!",
-                    "Инфо",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                ShowMessageHelper.ShowInfo("Копирование файлов завершено!");
             }
         }
 
@@ -142,11 +136,7 @@ namespace WinFormsApp
         public static void ErrorMessage(string text)
         {
             _logger.Error(text);
-            MessageBox.Show(
-                    text,
-                    "Ошибка",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+            ShowMessageHelper.ShowError(text);
         }
 
         #endregion
@@ -182,41 +172,22 @@ namespace WinFormsApp
             string forkName_1,
             string forkName_2)
         {
-            List<string> result = new List<string>();
-
-            try
-            {
-                using (PowerShell powershell = PowerShell.Create())
+            CommandHandlerResultModel commandHandlerResult = CommandHandler.PowerShellInvoke(
+                new List<string>()
                 {
-                    powershell.AddScript($"cd {pathToRepo}");
-                    powershell.AddScript($"git diff --name-only --encoding=utf8 {forkName_1}..{forkName_2}");
+                    $"cd {pathToRepo}",
+                    $"git diff --name-only --encoding=utf8 {forkName_1}..{forkName_2}"
+                });
 
-                    if (powershell != null)
-                    {
-                        Collection<PSObject> psResults = powershell.Invoke();
-
-                        if (powershell.Streams.Error.Any())
-                        {
-                            string errors = $"Список ошибок:{Environment.NewLine}";
-                            errors += string.Join(Environment.NewLine, powershell.Streams.Error);
-                            ErrorMessage(errors);
-
-                            return result;
-                        }
-
-                        if (psResults.Any())
-                        {
-                            result.AddRange(psResults.Select(psResult => psResult.BaseObject.ToString()));
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
+            if (commandHandlerResult.HasErrors)
             {
-                ErrorMessage($"Произошла ошибка выполнения скрипта:{Environment.NewLine}{ex.Message}");
+                ShowMessageHelper.ShowError(commandHandlerResult.Errors);
+                return new List<string>();
             }
-
-            return result;
+            else
+            {
+                return commandHandlerResult.Result;
+            }
         }
 
         private static List<string> ShowChangesBetweenBranchesCmd(
@@ -224,58 +195,20 @@ namespace WinFormsApp
             string forkName_1,
             string forkName_2)
         {
-            List<string> result = new List<string>();
+            CommandHandlerResultModel commandHandlerResult = CommandHandler.CmdInvoke(
+                new List<string>()
+                {
+                    $"cd {pathToRepo}",
+                    $"git diff --name-only --encoding=utf8 {forkName_1}..{forkName_2}"
+                });
 
-            try
+            if (commandHandlerResult.HasErrors)
             {
-                string currentDirectory = Environment.CurrentDirectory;
-                string diffPath = Path.Combine(currentDirectory, "git_diff.diff");
-                string cmd_1 = $"cd {pathToRepo}";
-                string cmd_2 = $"git diff --name-only --encoding=utf8 {forkName_1}..{forkName_2} > \"{diffPath}\"";
-
-                ProcessStartInfo startInfo = new ProcessStartInfo()
-                {
-                    FileName = "cmd.exe",
-                    Arguments = $"/c {cmd_1}&{cmd_2}",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                };
-
-                using Process process = new Process() { StartInfo = startInfo };
-                process.Start();
-                string error = process.StandardError.ReadToEnd();
-
-                if (!string.IsNullOrEmpty(error))
-                {
-                    return result;
-                }
-
-                process.WaitForExit();
-                process.Close();
-
-                using (var reader = new StreamReader(diffPath))
-                {
-                    string line;
-
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        result.Add(line);
-                    }
-                }
-
-                if (File.Exists(diffPath))
-                {
-                    File.Delete(diffPath);
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage($"Произошла ошибка выполнения скрипта:{Environment.NewLine}{ex.Message}");
+                ShowMessageHelper.ShowError(commandHandlerResult.Errors);
+                return new List<string>();
             }
 
-            return result;
+            return commandHandlerResult.Result;
         }
 
         #endregion
